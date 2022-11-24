@@ -6,8 +6,8 @@ import requests
 class Freelancer():
     def __init__(self) -> None:
         self.projects_id = []
-        self.skills_id = [1558]
-        # self.skills_id = [292,761,913,999,1199,1402,1558,1601]
+        # self.skills_id = [1558]
+        self.skills_id = [292,761,913,999,1199,1402,1558,1601]
 
     # Trying to find new projects
     def fetch_projects(self):
@@ -24,9 +24,7 @@ class Freelancer():
                     new_projects.append(p)
                 
                 if len(self.projects_id) > 30:
-                    self.projects_id = self.projects_id[1:]
-        
-
+                    self.projects_id = self.projects_id[1:]     
 
         return new_projects
     

@@ -17,22 +17,26 @@ def index():
     if request.method == 'POST':
         # Restore message data
         msg = request.get_json()
-
-        # parsing data
         chat_id,txt = parse_message(msg)
-        if txt == "fetch":
-            # Get projects from freelancer and send it on telegram
+
+        if txt == "id":
+            tel_send_message(chat_id,f'your id is {chat_id}')
+
+        return "Accepted"
+        
+
+    if request.method == 'GET':
+        start = False
+        start = request.args.get('start')
+        if start == "True":
+            tel_send_message(75248049,"======= START =======")
             projects = freelancer.fetch_projects()
             for p in projects:
                 msg_maked = freelancer.make_message(p)
-                tel_send_message(chat_id,msg_maked)
+                tel_send_message(75248049,msg_maked)
+        
+        return "GET method recived"
 
-        else:
-            tel_send_message(chat_id,'Not iplemented!')
-       
-        return Response('ok', status=200)
-    else:
-        return "<h1>Welcome!</h1>"
  
 if __name__ == '__main__':
    app.run(debug=True)

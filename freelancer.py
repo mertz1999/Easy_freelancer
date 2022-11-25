@@ -4,13 +4,14 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from datetime import datetime
 import requests
+import pickle
 import time
+import os
 
 
 
 class Freelancer():
     def __init__(self, username, password, driver_path="./driver/chromedriver.exe") -> None:
-        self.projects_id = []
         self.username    = username
         self.password    = password
         self.skills_id   = [292,761,913,999,1199,1402,1558,1601]
@@ -20,20 +21,36 @@ class Freelancer():
 
     # Trying to find new projects
     def fetch_projects(self):
+        # Check if we have prev. project
+        if os.path.isfile("./proposals/projects.pkl"):
+            dbfile = open('./proposals/projects.pkl', 'rb')     
+            projects_id = pickle.load(dbfile) 
+            dbfile.close()
+        else:
+            projects_id = []
+
         new_projects = []
         for id in self.skills_id:
             # Request to freelancer.com
             r = requests.get(f'https://www.freelancer.com/api/projects/0.1/projects/active?jobs[]={id}&full_description=True&limit=5')
             projects =  r.json()['result']['projects']
 
+            
             for p in projects:
                 # Check this project has been record or not
-                if p['id'] not in self.projects_id:
-                    self.projects_id.append(p['id'])
+                delta_time =(datetime.now() - datetime.fromtimestamp(p['submitdate'])).seconds
+                if (p['id'] not in projects_id) and (delta_time < 43200):
+                    print(p['id'])
+                    projects_id.append(p['id'])
                     new_projects.append(p)
                 
-                if len(self.projects_id) > 30:
-                    self.projects_id = self.projects_id[1:]     
+                    if len(projects_id) > 100:
+                        projects_id.pop(0)    
+
+        # save pickle file
+        dbfile = open('./proposals/projects.pkl', 'wb')     
+        pickle.dump(projects_id, dbfile)
+        dbfile.close()
 
         return new_projects
     
@@ -155,14 +172,30 @@ class Freelancer():
 
                 return True
             except:
-                return False
-
-            
+                return False     
 
         else:
             print("Login not completed!")
             return False
 
+    def parse_bid(self, temp_path='proposals/temp', prop_path='proposals/prop'):
+        temp_file = open(temp_path, 'r')
+        prop_file = open(prop_path, 'w')
+        for idx, line in enumerate(temp_file.readlines()):
+            if   idx == 1 : p_id    = int(line[:-1])
+            elif idx == 2 : amount  = int(line[:-1])
+            elif idx == 3 : priod   = int(line[:-1])
+            elif idx >= 4:
+                prop_file.write(line)
+        
+        temp_file.close()
+        prop_file.close()
+
+        r = requests.get(f'https://www.freelancer.com/api/projects/0.1/projects/{p_id}')
+        if r.json()['status'] != 'error':
+            project_url =  "https://www.freelancer.com/projects/"+r.json()['result']['seo_url']
+        
+        return project_url, amount, priod
 
 
 # Test This class

@@ -1,14 +1,13 @@
+import requests
 from flask import Flask
 from flask import request
+from datetime import datetime
 from flask import Response
 from freelancer import Freelancer
 from utils import parse_message,tel_send_message
 
-
-    
-
 app        = Flask(__name__)
-freelancer = Freelancer()
+freelancer = Freelancer(username= "hihellosalam2022@gmail.com", password="@Rezatz1378")
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -19,8 +18,21 @@ def index():
         msg = request.get_json()
         chat_id,txt = parse_message(msg)
 
+        # Get id of telegram Chat
         if txt == "id":
             tel_send_message(chat_id,f'your id is {chat_id}')
+        
+        # Get bid from user
+        if (txt[0:10].lower() == 'freelancer'):
+            prop_file = open('proposals/temp','w')
+            prop_file.write(txt)
+            prop_file.close()
+
+            url, amount, period = freelancer.parse_bid()
+            if freelancer.send_bid(url=url, priod=period, amount=amount): 
+                tel_send_message(chat_id,"Bid is one site!")
+            else:
+                tel_send_message(chat_id,"Problem to send bid!")
 
         return "Accepted"
         
@@ -29,7 +41,7 @@ def index():
         start = False
         start = request.args.get('start')
         if start == "True":
-            tel_send_message(75248049,"======= START =======")
+            print(datetime.now())
             projects = freelancer.fetch_projects()
             for p in projects:
                 msg_maked = freelancer.make_message(p)

@@ -1,13 +1,22 @@
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium import webdriver
 from datetime import datetime
 import requests
+import time
 
 
 
 class Freelancer():
-    def __init__(self) -> None:
+    def __init__(self, username, password, driver_path="./driver/chromedriver.exe") -> None:
         self.projects_id = []
-        # self.skills_id = [1558]
-        self.skills_id = [292,761,913,999,1199,1402,1558,1601]
+        self.username    = username
+        self.password    = password
+        self.skills_id   = [292,761,913,999,1199,1402,1558,1601]
+        self.service     = Service(executable_path= driver_path)
+        self.driver      = webdriver.Chrome(service=self.service)
+
 
     # Trying to find new projects
     def fetch_projects(self):
@@ -70,3 +79,94 @@ class Freelancer():
 
         return msg_maked
 
+    # Login
+    def login(self):
+        if ('freelancer' not in self.driver.current_url) or ('login' in self.driver.current_url):
+            try:
+                # Get login url
+                self.driver.get("https://www.freelancer.com/login")
+
+                # Send email address
+                inputs = self.driver.find_elements(By.XPATH, "//input[@id='emailOrUsernameInput']")
+                inputs[1].send_keys(self.username)
+
+                # Send password
+                inputs = self.driver.find_elements(By.XPATH, "//input[@id='passwordInput']")
+                inputs[1].send_keys(self.password)
+
+                time.sleep(3)
+                buttun = self.driver.find_elements(By.XPATH, "//app-login-signup-button")
+                buttun[0].click()
+
+                time.sleep(5)
+
+                return True
+            except:
+                return False
+        else:
+            return True
+    
+
+    # Set Bid on projects
+    def send_bid(self, url, priod, amount, prop_path='proposals\prop'):
+        if self.login():
+            # Check login don`t require verification
+            total_page = self.driver.find_elements(By.TAG_NAME, "body")
+            total_page = total_page[0].text
+            if '2-Step Verification' in total_page:
+                print("Verification need")
+                return False
+            
+            # Redirect to project url path
+            try:
+                self.driver.get(url)
+                time.sleep(10)
+
+                # set display=None for messaging
+                self.driver.execute_script("document.getElementsByTagName('app-messaging')[0].style.display = 'none';")
+
+                # Send priod
+                inputs = self.driver.find_elements(By.ID, "periodInput")
+                inputs[0].clear()
+                inputs[0].send_keys(priod) 
+
+                time.sleep(2)
+
+                # Send amout of money
+                inputs = self.driver.find_elements(By.ID, "bidAmountInput")
+                inputs[0].clear()
+                inputs[0].send_keys(0)
+                for i in range(10):
+                    inputs[0].send_keys(Keys.BACK_SPACE)
+                inputs[0].send_keys(amount)
+
+                # Send proposal
+                inputs = self.driver.find_elements(By.ID, "descriptionTextArea")
+                proposal_file = open(prop_path,"r")
+                proposal = proposal_file.read()
+                inputs[0].send_keys(proposal)
+
+                # Set bid
+                time.sleep(3)
+                buttun = self.driver.find_elements(By.XPATH, "//fl-button[@class='BidFormBtn']")
+                buttun[0].click()
+
+                time.sleep(3)
+
+                return True
+            except:
+                return False
+
+            
+
+        else:
+            print("Login not completed!")
+            return False
+
+
+
+# Test This class
+
+# freelancer = Freelancer(username= "hihellosalam2022@gmail.com", password="@Rezatz1378")
+
+# print(freelancer.send_bid("https://www.freelancer.com/projects/python/DDOs-attack-simuation-using-Machine", priod=10, amount=170))

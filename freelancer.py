@@ -38,8 +38,9 @@ class Freelancer():
             
             for p in projects:
                 # Check this project has been record or not
-                delta_time =(datetime.now() - datetime.fromtimestamp(p['submitdate'])).seconds
-                if (p['id'] not in projects_id) and (delta_time < 43200):
+                delta_time_sec =(datetime.now() - datetime.fromtimestamp(p['submitdate'])).seconds
+                delta_time_day =(datetime.now() - datetime.fromtimestamp(p['submitdate'])).days
+                if (p['id'] not in projects_id) and (delta_time_day == 0) and (delta_time_sec < 18000):
                     print(p['id'])
                     projects_id.append(p['id'])
                     new_projects.append(p)

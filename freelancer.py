@@ -102,6 +102,7 @@ class Freelancer():
             try:
                 # Get login url
                 self.driver.get("https://www.freelancer.com/login")
+                time.sleep(5)
 
                 # Send email address
                 inputs = self.driver.find_elements(By.XPATH, "//input[@id='emailOrUsernameInput']")

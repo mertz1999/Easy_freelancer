@@ -6,8 +6,11 @@ from flask import Response
 from freelancer import Freelancer
 from utils import parse_message,tel_send_message
 
+username = "hihellosalam2022@gmail.com"
+password = "@Rezatz1378"
+
 app        = Flask(__name__)
-freelancer = Freelancer(username= "hihellosalam2022@gmail.com", password="@Rezatz1378")
+freelancer = Freelancer(username= username, password= password)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -21,6 +24,11 @@ def index():
         # Get id of telegram Chat
         if txt == "id":
             tel_send_message(chat_id,f'your id is {chat_id}')
+
+        if txt == "restart":
+            freelancer.driver.close()
+            freelancer = Freelancer(username= username, password= password)
+        
         
         # Get bid from user
         if (txt[0:10].lower() == 'freelancer'):
@@ -28,11 +36,16 @@ def index():
             prop_file.write(txt)
             prop_file.close()
 
-            url, amount, period = freelancer.parse_bid()
-            if freelancer.send_bid(url=url, priod=period, amount=amount): 
-                tel_send_message(chat_id,"Bid is one site!")
-            else:
-                tel_send_message(chat_id,"Problem to send bid!")
+            try:
+                url, amount, period = freelancer.parse_bid()
+                if freelancer.send_bid(url=url, priod=period, amount=amount): 
+                    tel_send_message(chat_id,"Bid is one site!")
+                else:
+                    tel_send_message(chat_id,"Problem to send bid!")
+                return "OK"
+            except:
+                return "Don`t work correctly"
+
 
         return "Accepted"
         

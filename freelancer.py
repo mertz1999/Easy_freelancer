@@ -200,6 +200,7 @@ class Freelancer():
 
 # Test This class
 
-# freelancer = Freelancer(username= "hihellosalam2022@gmail.com", password="@Rezatz1378")
+# freelancer = Freelancer(username= "", password="@Rezatz1378")
+# freelancer.login()
 
 # print(freelancer.send_bid("https://www.freelancer.com/projects/python/DDOs-attack-simuation-using-Machine", priod=10, amount=170))

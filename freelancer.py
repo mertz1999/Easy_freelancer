@@ -66,7 +66,7 @@ class Freelancer():
         submitted   = datetime.fromtimestamp(in_json['submitdate'])
         budget_type = 'per hour' if in_json['type'] == 'hourly' else 'fixed price'
         budget      = in_json['budget']
-        bids_info   = f'Total: {in_json["bid_stats"]["bid_count"]}  Avg: {int(in_json["bid_stats"]["bid_avg"])}'
+        bids_info   = f'Total: {in_json["bid_stats"]["bid_count"]}  Avg: {in_json["bid_stats"]["bid_avg"]}'
         
         max_hours_str = ''
         if in_json['type'] == 'hourly':

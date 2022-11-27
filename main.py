@@ -28,6 +28,7 @@ def index():
         if txt == "restart":
             freelancer.driver.close()
             freelancer = Freelancer(username= username, password= password)
+            tel_send_message(chat_id,f'Restarting is complete')
         
         
         # Get bid from user

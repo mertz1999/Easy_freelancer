@@ -15,6 +15,7 @@ freelancer = Freelancer(username= username, password= password)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global freelancer
     # Check request type
     if request.method == 'POST':
         # Restore message data

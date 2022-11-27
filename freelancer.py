@@ -14,7 +14,7 @@ class Freelancer():
     def __init__(self, username, password, driver_path="./driver/chromedriver.exe") -> None:
         self.username    = username
         self.password    = password
-        self.skills_id   = [292,761,913,999,1199,1402,1558,1601]
+        self.skills_id   = [13,292,761,913,999,1199,1402,1558,1601]
         self.service     = Service(executable_path= driver_path)
         self.driver      = webdriver.Chrome(service=self.service)
 
